@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>MPG related to Transmission</title>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>MPG related to Transmission</h1>
+
+<p>The amount of data is really small (32 cars) so any of our conclusion will be significant. First we obtain the mean and standard deviation from the whole dataset:</p>
+
+<pre><code class="r">library(datasets);data(mtcars)
+sd(mtcars$mpg);mean(mtcars$mpg)
+[1] 6.026948
+[1] 20.09062
+</code></pre>
+
+<p>After that whe can compute the manual and the automatic data separately:</p>
+
+<pre><code class="r">man&lt;-subset(mtcars,am==1);aut&lt;-subset(mtcars,am==0)
+cbind(c(sd(aut$mpg),mean(aut$mpg)),c(sd(man$mpg),mean(man$mpg)))
+          [,1]      [,2]
+[1,]  3.833966  6.166504
+[2,] 17.147368 24.392308
+</code></pre>
+
+<p>We can use the data in a sloopy way and say that the probability to have a mpg under the mean if we pick an automatic car is:</p>
+
+<pre><code class="r">length(subset(aut$mpg,aut$mpg&lt;mean(mtcars$mpg)))/length(aut$mpg)
+[1] 0.7894737
+</code></pre>
+
+<p>And also the probability to obtain an mpg above the mean when we pick a manual car is:</p>
+
+<pre><code class="r">length(subset(man$mpg,man$mpg&gt;mean(mtcars$mpg)))/length(man$mpg)
+[1] 0.7692308
+</code></pre>
+
+<p>What points out the a small lack of data in this study because attending to Standar deviation both probabilities should be smaller:</p>
+
+<pre><code class="r"> (mean(mtcars$mpg)-mean(aut$mpg))/sd(aut$mpg)
+[1] 0.7676793
+(mean(man$mpg)-mean(mtcars$mpg))/sd(man$mpg)
+[1] 0.6975886
+</code></pre>
+
+<p>0.70 sigma corresponds to 0.758 probability wich is fairly accurate
+0.77 sigma corresponds to 0.776 probability wich is fairly accurate too</p>
+
+<p>So a manual transmission tends to be better for the mpg!!!</p>
+
+<p>Appendix</p>
+
+<p>Weight seems to be a good predictor for the mpg, mainly in the manual cars</p>
+
+<pre><code class="r"> cor(mtcars$mpg,mtcars$wt)
+[1] -0.8676594
+ cor(man$mpg,man$wt)
+[1] -0.9089148
+ cor(aut$mpg,aut$wt)
+[1] -0.7676554
+
+manm&lt;-lm(man$mpg~man$wt)
+autm&lt;-lm(aut$mpg~aut$wt)
+coef(manm)
+(Intercept)      man$wt 
+  46.294478   -9.084268 
+coef(autm)
+(Intercept)      aut$wt 
+  31.416055   -3.785908 
+</code></pre>
+
+</body>
+
+</html>
